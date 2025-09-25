@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test - Bitrefill</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .loading {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bitrefill API Test</h1>
+    <p>This page tests the Bitrefill APIs to check if they work with CORS proxy.</p>
+    
+    <div class="test-section">
+        <h2>Test 1: Gift Cards API</h2>
+        <button onclick="testGiftCards()">Test Gift Cards API</button>
+        <div id="gift-cards-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: FX Rates API</h2>
+        <button onclick="testFXRates()">Test FX Rates API</button>
+        <div id="fx-rates-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Product Details API</h2>
+        <button onclick="testProductDetails()">Test Product Details API</button>
+        <div id="product-details-result"></div>
+    </div>
+
+    <script>
+        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+        
+        function showResult(elementId, content, isError = false) {
+            const element = document.getElementById(elementId);
+            element.className = isError ? 'error' : 'success';
+            element.innerHTML = content;
+        }
+        
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.className = 'loading';
+            element.innerHTML = 'Loading...';
+        }
+        
+        async function testGiftCards() {
+            showLoading('gift-cards-result');
+            try {
+                const url = CORS_PROXY + encodeURIComponent('https://www.bitrefill.com/api/omni?c=all-gift-cards&country=IN');
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const products = data.products || [];
+                
+                showResult('gift-cards-result', `
+                    <h3>✅ Success!</h3>
+                    <p>Found ${products.length} gift cards</p>
+                    <p>Sample products:</p>
+                    <ul>
+                        ${products.slice(0, 5).map(p => `<li>${p.name} - ${p._priceRange}</li>`).join('')}
+                    </ul>
+                `);
+            } catch (error) {
+                showResult('gift-cards-result', `
+                    <h3>❌ Error</h3>
+                    <p>${error.message}</p>
+                `, true);
+            }
+        }
+        
+        async function testFXRates() {
+            showLoading('fx-rates-result');
+            try {
+                const url = CORS_PROXY + encodeURIComponent('https://www.bitrefill.com/api/accounts/fx_rates');
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                showResult('fx-rates-result', `
+                    <h3>✅ Success!</h3>
+                    <p>FX Rates loaded successfully</p>
+                    <p>INR to USD rate: ${data.INR?.USD || 'N/A'}</p>
+                    <p>INR to EUR rate: ${data.INR?.EUR || 'N/A'}</p>
+                `);
+            } catch (error) {
+                showResult('fx-rates-result', `
+                    <h3>❌ Error</h3>
+                    <p>${error.message}</p>
+                `, true);
+            }
+        }
+        
+        async function testProductDetails() {
+            showLoading('product-details-result');
+            try {
+                const url = CORS_PROXY + encodeURIComponent('https://www.bitrefill.com/api/product/flipkart-india');
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                showResult('product-details-result', `
+                    <h3>✅ Success!</h3>
+                    <p>Product details loaded successfully</p>
+                    <p>Product: ${data.name}</p>
+                    <p>Packages: ${data.packages?.length || 0}</p>
+                    <p>Stock Status: ${data.outOfStock ? 'Out of Stock' : 'In Stock'}</p>
+                `);
+            } catch (error) {
+                showResult('product-details-result', `
+                    <h3>❌ Error</h3>
+                    <p>${error.message}</p>
+                `, true);
+            }
+        }
+        
+        // Auto-run tests on page load
+        window.onload = function() {
+            setTimeout(() => {
+                testGiftCards();
+                testFXRates();
+                testProductDetails();
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
