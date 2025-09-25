@@ -32,19 +32,94 @@ Where:
 - USD Price in INR = USD Price × INR to USD conversion rate
 - Package Value = The gift card value in INR
 
-## Installation
+## Live Demo
 
-1. Install dependencies:
+Visit the live application: [https://yourusername.github.io/bitrefill](https://yourusername.github.io/bitrefill)
+
+## Local Development
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/bitrefill.git
+cd bitrefill
+```
+
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-2. Start the development server:
+3. Start the development server:
 ```bash
 npm start
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+## Deployment to GitHub Pages
+
+This project is configured for easy deployment to GitHub Pages.
+
+### First-time Setup
+
+1. **Update the homepage URL** in `package.json`:
+   - Replace `yourusername` with your actual GitHub username
+   - Replace `bitrefill` with your actual repository name
+
+2. **Create a GitHub repository**:
+   - Go to GitHub and create a new repository
+   - Don't initialize with README (since we already have one)
+
+3. **Push your code to GitHub**:
+```bash
+git remote add origin https://github.com/yourusername/bitrefill.git
+git branch -M main
+git push -u origin main
+```
+
+4. **Deploy to GitHub Pages**:
+```bash
+npm run deploy
+```
+
+### Subsequent Deployments
+
+For future updates, simply run:
+```bash
+npm run deploy
+```
+
+This will:
+- Build the production version
+- Deploy it to the `gh-pages` branch
+- Make it available at your GitHub Pages URL
+
+### GitHub Pages Configuration
+
+After the first deployment:
+1. Go to your repository settings on GitHub
+2. Navigate to "Pages" in the left sidebar
+3. Under "Source", select "Deploy from a branch"
+4. Select "gh-pages" branch and "/ (root)" folder
+5. Click "Save"
+
+Your site will be available at: `https://yourusername.github.io/bitrefill`
+
+## Build
+
+To create a production build:
+```bash
+npm run build
+```
+
+This builds the app for production to the `build` folder.
+
+## Available Scripts
+
+- `npm start` - Runs the app in development mode
+- `npm run build` - Builds the app for production
+- `npm test` - Launches the test runner
+- `npm run deploy` - Deploys the app to GitHub Pages
 
 ## API Endpoints Used
 
