@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A website to monitor Bitrefill gift card data with commission calculations",
   "main": "index.js",
-  "homepage": "https://yourusername.github.io/bitrefill",
+  "homepage": "https://alanjacob008.github.io/bitrefill",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
