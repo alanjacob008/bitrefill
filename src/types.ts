@@ -19,6 +19,7 @@ export interface Package {
   eurPrice: number;
   amount: number;
   eurValue: number;
+  prices?: { [currency: string]: number };
 }
 
 export interface ProductDetails {
@@ -57,6 +58,8 @@ export interface ProcessedGiftCard {
   categories: string[];
   iconPreview?: string;
   logoPreview?: string;
+  isFavorite?: boolean;
+  bestDealScore?: number;
 }
 
 export interface CommissionDetail {

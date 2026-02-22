@@ -10,109 +10,110 @@ import './App.css';
 
 function App() {
   const [giftCards, setGiftCards] = useState<ProcessedGiftCard[]>([]);
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    const saved = localStorage.getItem('bitrefill_favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [loading, setLoading] = useState(true);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [usdRate, setUsdRate] = useState<number | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('bitrefill_favorites', JSON.stringify(favorites));
+  }, [favorites]);
+
+  const handleToggleFavorite = (name: string) => {
+    setFavorites(prev => 
+      prev.includes(name) ? prev.filter(f => f !== name) : [...prev, name]
+    );
+  };
 
   const fetchData = useCallback(async () => {
     setLoading(true);
+    setLoadingDetails(false);
     setError(null);
-    setGiftCards([]); // Clear existing data
-    
+    setGiftCards([]);
+
     try {
-      // Start with basic gift card data and FX rates first
+      // Fetch the product list and FX rates in parallel
       const [giftCardsResponse, fxRatesResponse] = await Promise.all([
         apiService.getGiftCards(),
-        apiService.getFXRates()
+        apiService.getFXRates(),
       ]);
-      
-      // Process initial gift cards without detailed product info
+
       const processor = new DataProcessor(fxRatesResponse);
-      const initialProcessedCards = giftCardsResponse.map(giftCard => 
-        processor.processGiftCard(giftCard)
-      );
-      
-      setGiftCards(initialProcessedCards);
+
+      // Show the table immediately with basic data (commission will show N/A until details load)
+      const initialCards = giftCardsResponse.map((card) => {
+        const processed = processor.processGiftCard(card);
+        return { ...processed, isFavorite: favorites.includes(processed.productName) };
+      });
+      if (initialCards.length > 0) {
+        setUsdRate(initialCards[0].usdRate);
+      }
+      setGiftCards(initialCards);
       setLastUpdated(new Date());
       setLoading(false);
       setLoadingDetails(true);
-      
-      // Now fetch detailed product information in the background
-      // and update cards as we get the data
-      const updatedCards = [...initialProcessedCards];
-      
-      // Process products in batches to avoid overwhelming the API
-      const batchSize = 5;
-      const productIds = giftCardsResponse.map(card => card._id);
-      
-      for (let i = 0; i < productIds.length; i += batchSize) {
-        const batch = productIds.slice(i, i + batchSize);
-        
-        const batchPromises = batch.map(async (productId) => {
-          try {
-            const productDetail = await apiService.getProductDetails(productId);
-            if (productDetail) {
-              // Update the specific card with detailed information
-              const cardIndex = updatedCards.findIndex(card => 
-                card.productName === giftCardsResponse.find(gc => gc._id === productId)?.name
-              );
-              
-              if (cardIndex !== -1) {
-                const originalCard = giftCardsResponse.find(gc => gc._id === productId);
-                if (originalCard) {
-                  updatedCards[cardIndex] = processor.processGiftCard(originalCard, productDetail);
-                  setGiftCards([...updatedCards]); // Update UI immediately
-                }
-              }
+
+      // Fetch ALL product details in parallel
+      const updatedCards = [...initialCards];
+
+      await Promise.allSettled(
+        giftCardsResponse.map((card, index) =>
+          apiService.getProductDetails(card._id).then((detail) => {
+            if (detail) {
+              const processed = processor.processGiftCard(card, detail);
+              updatedCards[index] = { 
+                ...processed, 
+                isFavorite: favorites.includes(processed.productName) 
+              };
+              setGiftCards([...updatedCards]);
             }
-          } catch (error) {
-            console.warn(`Failed to fetch details for ${productId}:`, error);
-            // Continue with other products even if one fails
-          }
-        });
-        
-        await Promise.all(batchPromises);
-        
-        // Small delay between batches to be respectful to the API
-        if (i + batchSize < productIds.length) {
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
-      }
-      
+          })
+        )
+      );
+
       setLoadingDetails(false);
-      
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setError(error instanceof Error ? error.message : 'Failed to fetch data');
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch data');
       setLoading(false);
+      setLoadingDetails(false);
     }
-  }, []);
+  }, [favorites]);
+
+  useEffect(() => {
+    setGiftCards(prev => prev.map(card => ({
+      ...card,
+      isFavorite: favorites.includes(card.productName)
+    })));
+  }, [favorites]);
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
-
-  const handleRefresh = () => {
-    fetchData();
-  };
+  }, []); // Only run once on mount
 
   return (
     <div className="app">
-      <Header 
-        onRefresh={handleRefresh}
+      <Header
+        onRefresh={fetchData}
         lastUpdated={lastUpdated}
         loading={loading}
         loadingDetails={loadingDetails}
+        usdRate={usdRate}
       />
-      
+
       <main className="main-content">
         {loading && <LoadingSpinner />}
-        {error && <ErrorMessage message={error} onRetry={handleRefresh} />}
+        {error && <ErrorMessage message={error} onRetry={fetchData} />}
         {!loading && !error && (
-          <GiftCardTable 
+          <GiftCardTable
             giftCards={giftCards}
-            onRefresh={handleRefresh}
+            onRefresh={fetchData}
+            onToggleFavorite={handleToggleFavorite}
           />
         )}
       </main>

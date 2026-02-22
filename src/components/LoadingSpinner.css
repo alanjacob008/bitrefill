@@ -8,29 +8,25 @@
 
 .loading-content {
   text-align: center;
-  color: #64748b;
+  color: var(--br-muted);
 }
 
 .spinner {
   animation: spin 1s linear infinite;
-  color: #3b82f6;
+  color: var(--br-red);
   margin-bottom: 1rem;
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 .loading-content h3 {
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 0.5rem;
-  color: #1e293b;
+  color: var(--br-text);
 }
 
 .loading-content p {

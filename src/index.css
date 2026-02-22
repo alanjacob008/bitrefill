@@ -1,20 +1,88 @@
-* {
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
+
+/* ─── Design Tokens ───────────────────────────────────────────── */
+:root {
+  /* Page & Surface */
+  --br-bg:           #0d1117;
+  --br-surface:      #161b22;
+  --br-surface-2:    #21262d;
+
+  /* Borders */
+  --br-border:       #30363d;
+  --br-border-hover: #484f58;
+
+  /* Brand */
+  --br-red:          #ec2225;
+  --br-red-dim:      rgba(236, 34, 37, 0.12);
+  --br-purple:       #7b3fe4;
+
+  /* Text */
+  --br-text:         #e6edf3;
+  --br-muted:        #8b949e;
+
+  /* Semantic */
+  --br-green:        #3fb950;
+  --br-green-dim:    rgba(63, 185, 80, 0.1);
+  --br-amber:        #d29922;
+  --br-amber-dim:    rgba(210, 153, 34, 0.12);
+  --br-gold:         #f0b429;
+
+  /* Layout */
+  --br-max-w:        1280px;
+  --br-radius-sm:    0.5rem;
+  --br-radius:       0.75rem;
+  --br-radius-lg:    1rem;
+  --br-radius-xl:    1.25rem;
+  --br-radius-pill:  999px;
+
+  /* Aliases used by existing components */
+  --bitrefill-bg:           var(--br-bg);
+  --bitrefill-surface:      var(--br-surface);
+  --bitrefill-surface-hover:var(--br-surface-2);
+  --bitrefill-primary:      var(--br-red);
+  --bitrefill-secondary:    var(--br-purple);
+  --bitrefill-text:         var(--br-text);
+  --bitrefill-text-muted:   var(--br-muted);
+  --bitrefill-border:       var(--br-border);
+  --bitrefill-success:      var(--br-green);
+  --max-width:               var(--br-max-w);
+}
+
+/* ─── Base ────────────────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--br-bg);
+  color: var(--br-text);
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f8fafc;
-  color: #1e293b;
 }
 
+a          { color: inherit; text-decoration: none; }
+button     { font-family: inherit; cursor: pointer; }
+input,
+select     { font-family: inherit; }
+img        { display: block; max-width: 100%; }
+
+::selection {
+  background: var(--br-red-dim);
+  color: var(--br-text);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--br-bg); }
+::-webkit-scrollbar-thumb { background: var(--br-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--br-border-hover); }
+
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', Menlo, Consolas, monospace;
 }

@@ -41,3 +41,4 @@ pids
 
 # OS generated files
 Thumbs.db
+.claude/settings.local.json

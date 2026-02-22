@@ -12,19 +12,19 @@
 }
 
 .error-icon {
-  color: #ef4444;
+  color: var(--br-red);
   margin-bottom: 1rem;
 }
 
 .error-content h3 {
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 0.5rem;
-  color: #1e293b;
+  color: var(--br-text);
 }
 
 .error-message {
-  color: #64748b;
+  color: var(--br-muted);
   margin-bottom: 1.5rem;
   line-height: 1.5;
 }
@@ -33,16 +33,18 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: #3b82f6;
+  background: var(--br-red);
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
-  font-weight: 500;
+  border-radius: var(--br-radius-sm);
+  font-weight: 700;
+  font-size: 0.9375rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: filter 0.2s, transform 0.2s;
 }
 
 .retry-button:hover {
-  background: #2563eb;
+  filter: brightness(1.1);
+  transform: translateY(-1px);
 }

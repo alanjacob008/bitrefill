@@ -1,5 +1,5 @@
 import React from 'react';
-import { RefreshCw, Clock } from 'lucide-react';
+import { RefreshCw, Clock, DollarSign } from 'lucide-react';
 import './Header.css';
 
 interface HeaderProps {
@@ -7,46 +7,48 @@ interface HeaderProps {
   lastUpdated: Date | null;
   loading: boolean;
   loadingDetails?: boolean;
+  usdRate?: number | null;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onRefresh, lastUpdated, loading, loadingDetails = false }) => {
+export const Header: React.FC<HeaderProps> = ({ onRefresh, lastUpdated, loading, loadingDetails = false, usdRate }) => {
   const formatLastUpdated = (date: Date) => {
-    return date.toLocaleString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+      minute: '2-digit'
     });
   };
 
   return (
     <header className="header">
-      <div className="header-content">
+      <div className="header-inner">
         <div className="header-left">
-          <h1 className="header-title">Bitrefill Gift Card Monitor</h1>
-          <p className="header-subtitle">Track gift card prices and commissions in real-time</p>
+          <div className="bitrefill-logo">
+             <span className="logo-text">bitrefill</span>
+             <span className="country-tag">India</span>
+          </div>
+          {usdRate && (
+            <div className="header-rate">
+              <DollarSign size={14} />
+              <span>1 USD = ₹{usdRate.toFixed(2)}</span>
+            </div>
+          )}
         </div>
         
         <div className="header-right">
-          {lastUpdated && (
-            <div className="last-updated">
-              <Clock size={16} />
-              <span>Last updated: {formatLastUpdated(lastUpdated)}</span>
-              {loadingDetails && (
-                <span className="loading-details">• Loading detailed data...</span>
-              )}
-            </div>
-          )}
-          
+          <div className="sync-status">
+            {loadingDetails ? (
+              <span className="syncing"><span className="dot"></span> Syncing</span>
+            ) : lastUpdated ? (
+              <span className="synced"><Clock size={14} /> {formatLastUpdated(lastUpdated)}</span>
+            ) : null}
+          </div>
           <button 
-            className={`refresh-button ${loading ? 'loading' : ''}`}
+            className={`bitrefill-btn-primary ${loading ? 'loading' : ''}`}
             onClick={onRefresh}
             disabled={loading}
           >
-            <RefreshCw size={16} className={loading ? 'spinning' : ''} />
-            {loading ? 'Refreshing...' : 'Refresh'}
+            <RefreshCw size={14} className={loading ? 'spinning' : ''} />
+            <span>{loading ? 'Fetching' : 'Update Data'}</span>
           </button>
         </div>
       </div>
